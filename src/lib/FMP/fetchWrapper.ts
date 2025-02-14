@@ -23,7 +23,7 @@ export async function fetchWrapper(type: string, params: Record<string, string>)
     const config = API_CONFIG[type as keyof typeof API_CONFIG];
     if (!config) throw new Error(`Invalid API type: ${type}`);
 
-    let endpoint = config.endpoint;
+    const endpoint = config.endpoint;
 
     // collect query parameters
     const queryParams: Record<string, string> = {};
