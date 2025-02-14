@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fetchWrapper } from "@/lib/FMP/fetchWrapper";
+import { fetchWrapper } from "@/lib/fmp/fetchWrapper";
 
 export async function GET(req: NextRequest) {
     try {
