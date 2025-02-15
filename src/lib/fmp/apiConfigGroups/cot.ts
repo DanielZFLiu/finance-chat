@@ -1,4 +1,4 @@
-import { BASE_URL, apiConfigInterface, paramDescriptionInterface } from "../apiConfig";
+import { BASE_URL, apiConfigInterface, paramDescriptionInterface } from "../apiConstant";
 
 // Commitment of Traders (COT)
 export const cotConfig: apiConfigInterface = {

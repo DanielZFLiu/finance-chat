@@ -25,19 +25,7 @@ import { quoteConfig, quoteParam } from "./apiConfigGroups/quote";
 import { secConfig, secParam } from "./apiConfigGroups/sec";
 import { earningsConfig, earningsParam } from "./apiConfigGroups/earnings";
 import { stateConfig, stateParam } from "./apiConfigGroups/senate";
-
-export const BASE_URL = "https://financialmodelingprep.com/stable";
-
-export interface apiConfigInterface {
-    [key: string]: {
-        endpoint: string;
-        queryParams: string[];
-        required: string[];
-        description: string;
-    }
-}
-
-export interface paramDescriptionInterface { [key: string]: { type: string; description: string } }
+import { apiConfigInterface, paramDescriptionInterface } from "./apiConstant";
 
 export const API_CONFIG: apiConfigInterface = {
     ...searchConfig,

@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
         if (error instanceof Error) {
             return NextResponse.json({ error: error.message }, { status: 500 });
         } else {
+            console.error("Unknown error:", error);
             return NextResponse.json({ error: "An unknown error occurred" }, { status: 500 });
         }
     }

@@ -1,4 +1,4 @@
-import { BASE_URL, apiConfigInterface, paramDescriptionInterface } from "../apiConfig";
+import { BASE_URL, apiConfigInterface, paramDescriptionInterface } from "../apiConstant";
 
 export const indexConfig: apiConfigInterface = {
     stockMarketIndexesList: {
