@@ -1,20 +1,24 @@
 import { API_CONFIG, PARAM_DESCRIPTIONS } from "./apiConfig";
 
 function checkParamType(key: string, value: string) {
-    const expectedType = PARAM_DESCRIPTIONS[key]?.type;
+    const expectedType = PARAM_DESCRIPTIONS[key].type;
 
-    // check if value is a number
-    function isNumeric(value: string): boolean {
-        return value !== "" && !isNaN(+value);
-    }
+    const isNumeric = (val: string) => val !== "" && !isNaN(+val);
 
-    if(expectedType === "number" && !isNumeric(value)){
-        throw new Error(`Invalid type for parameter ${key}. Expected ${expectedType}.`);
-    }
-    else if(expectedType === "string" && isNumeric(value)){
+    // validation functions
+    const validators: Record<string, (val: string) => boolean> = {
+        number: (val) => isNumeric(val),
+        string: (val) => !isNumeric(val),
+        boolean: (val) => val === "true" || val === "false",
+        date: (val) => !isNaN(Date.parse(val)),
+    };
+
+    // run the validator
+    if (!validators[expectedType]?.(value)) {
         throw new Error(`Invalid type for parameter ${key}. Expected ${expectedType}.`);
     }
 }
+
 
 export async function fetchWrapper(type: string, params: Record<string, string>) {
     const apiKey = process.env.FMP_API_KEY;

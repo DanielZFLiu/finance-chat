@@ -1,5 +1,4 @@
 "use client";
-import { send } from "process";
 import { useEffect } from "react";
 
 // test fmp api
@@ -10,22 +9,22 @@ async function fetchCompanyData() {
 }
 
 // test openai api
-async function sendChat() {
-  const response = await fetch("/api/openai", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ message: "Tell me a joke." }),
-  });
-  const data = await response.json();
-  console.log(data.response);
-}
+// async function sendChat() {
+//   const response = await fetch("/api/openai", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify({ message: "Find the name of AAPL." }),
+//   });
+//   const data = await response.json();
+//   console.log(data);
+// }
 
 export default function Page() {
   useEffect(() => {
-    // fetchCompanyData();
-    sendChat();
+    fetchCompanyData();
+    // sendChat();
   }, []);
 
   return <div>Test</div>;

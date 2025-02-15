@@ -1,31 +1,100 @@
-const BASE_URL = "https://financialmodelingprep.com/stable";
+import { searchConfig, searchParam } from "./apiConfigGroups/search";
+import { directoryConfig, directoryParam } from "./apiConfigGroups/directory";
+import { analystConfig, analystParam } from "./apiConfigGroups/analyst";
+import { calendarConfig, calendarParam } from "./apiConfigGroups/calendar";
+import { chartConfig, chartParam } from "./apiConfigGroups/chart";
+import { companyConfig, companyParam } from "./apiConfigGroups/company";
+import { cotConfig, cotParam } from "./apiConfigGroups/cot";
+import { economicsConfig, economicsParam } from "./apiConfigGroups/economics";
+import { esgConfig, esgParam } from "./apiConfigGroups/esg";
+import { dcfConfig, dcfParam } from "./apiConfigGroups/dcf";
+import { statementsConfig, statementsParam } from "./apiConfigGroups/statements";
+import { form13fConfig, form13fParam } from "./apiConfigGroups/form13f";
+import { indexConfig, indexParam } from "./apiConfigGroups";
+import { insiderTradesConfig, insiderTradesParam } from "./apiConfigGroups/insiderTrades";
+import { marketPerformanceConfig, marketPerformanceParam } from "./apiConfigGroups/marketPerformance";
+import { marketHoursConfig, marketHoursParam } from "./apiConfigGroups/marketHours";
+import { etfConfig, etfParam } from "./apiConfigGroups/etf";
+import { commodityConfig, commodityParam } from "./apiConfigGroups/commodity";
+import { fundraisersConfig, fundraisersParam } from "./apiConfigGroups/fundraisers";
+import { cryptoConfig, cryptoParam } from "./apiConfigGroups/crypto";
+import { forexConfig, forexParam } from "./apiConfigGroups/forex";
+import { newsConfig, newsParam } from "./apiConfigGroups/news";
+import { technicalIndicatorsConfig, technicalIndicatorsParam } from "./apiConfigGroups/technicalIndicators";
+import { quoteConfig, quoteParam } from "./apiConfigGroups/quote";
+import { secConfig, secParam } from "./apiConfigGroups/sec";
+import { earningsConfig, earningsParam } from "./apiConfigGroups/earnings";
+import { stateConfig, stateParam } from "./apiConfigGroups/senate";
 
-export const API_CONFIG = {
-    stockSymbolSearch: {
-        endpoint: `${BASE_URL}/search-symbol`,
-        queryParams: ["query", "limit", "exchange"],
-        required: ["query"],
-        description: "Easily find the ticker symbol of any stock with the FMP Stock Symbol Search API. Search by company name or symbol across multiple global markets."
-    },
-    companyNameSearch: {
-        endpoint: `${BASE_URL}/search-name`,
-        queryParams: ["query", "limit", "exchange"],
-        required: ["query"],
-        description: "Search for ticker symbols, company names, and exchange details for equity securities and ETFs listed on various exchanges with the FMP Name Search API. This endpoint is useful for retrieving ticker symbols when you know the full or partial company or asset name but not the symbol identifier."
-    },
-};
+export const BASE_URL = "https://financialmodelingprep.com/stable";
 
-export const PARAM_DESCRIPTIONS: { [key: string]: { type: string; description: string } }  = {
-    query: {
-        type: "string",
-        description: "Example: AAPL"
-    },
-    limit: {
-        type: "number",
-        description: "Example: 50"
-    },
-    exchange: {
-        type: "string",
-        description: "Example: NASDAQ"
+export interface apiConfigInterface {
+    [key: string]: {
+        endpoint: string;
+        queryParams: string[];
+        required: string[];
+        description: string;
     }
 }
+
+export interface paramDescriptionInterface { [key: string]: { type: string; description: string } }
+
+export const API_CONFIG: apiConfigInterface = {
+    ...searchConfig,
+    ...directoryConfig,
+    ...analystConfig,
+    ...calendarConfig,
+    ...chartConfig,
+    ...companyConfig,
+    ...cotConfig,
+    ...economicsConfig,
+    ...esgConfig,
+    ...dcfConfig,
+    ...statementsConfig,
+    ...form13fConfig,
+    ...indexConfig,
+    ...insiderTradesConfig,
+    ...marketPerformanceConfig,
+    ...marketHoursConfig,
+    ...etfConfig,
+    ...commodityConfig,
+    ...fundraisersConfig,
+    ...cryptoConfig,
+    ...forexConfig,
+    ...newsConfig,
+    ...technicalIndicatorsConfig,
+    ...quoteConfig,
+    ...secConfig,
+    ...earningsConfig,
+    ...stateConfig,
+};
+
+export const PARAM_DESCRIPTIONS: paramDescriptionInterface = {
+    ...searchParam,
+    ...directoryParam,
+    ...analystParam,
+    ...calendarParam,
+    ...chartParam,
+    ...companyParam,
+    ...cotParam,
+    ...economicsParam,
+    ...esgParam,
+    ...dcfParam,
+    ...statementsParam,
+    ...form13fParam,
+    ...indexParam,
+    ...insiderTradesParam,
+    ...marketPerformanceParam,
+    ...marketHoursParam,
+    ...etfParam,
+    ...commodityParam,
+    ...fundraisersParam,
+    ...cryptoParam,
+    ...forexParam,
+    ...newsParam,
+    ...technicalIndicatorsParam,
+    ...quoteParam,
+    ...secParam,
+    ...earningsParam,
+    ...stateParam,
+};
