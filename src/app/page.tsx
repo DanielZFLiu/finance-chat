@@ -40,6 +40,27 @@ async function sendChat() {
   console.log(data);
 }
 
+// test perplexity api
+async function askPerplexity() {
+  const response = await fetch("/api/perplexity", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "sonar-pro",
+      messages: [
+        {
+          role: "user",
+          content: "How big is the universe?"
+        }
+      ]
+    }),
+  });
+  const data = await response.json();
+  console.log(data);
+}
+
 export default function Page() {
   useEffect(() => {
     for (const key in API_CONFIG) {
@@ -88,7 +109,8 @@ export default function Page() {
 
 
     // fetchCompanyData();
-    sendChat();
+    // sendChat();
+    askPerplexity();
   }, []);
 
   return <div>Test</div>;
