@@ -21,6 +21,12 @@
  */
 
 import { API_CONFIG, PARAM_DESCRIPTIONS } from "@/lib/fmp/apiConfig";
+import { Tool } from "./openai/apiUtilities";
+
+// helper functions
+function concatMessages(message: { role: string; content: string; }, pastMessages?: { role: string; content: string; }[]) {
+    return (pastMessages ? pastMessages : []).concat([message]);
+}
 
 // 1: get relevant fmp endpoints
 interface endpoint {
@@ -46,13 +52,23 @@ for (const key in API_CONFIG) {
     });
 }
 
-export async function getRelevantEndpoints(query: string, model?: string) {
+export async function getRelevantEndpoints(query: string, model?: string, pastMessages?: { role: string; content: string; }[]) {
     const response = await fetch("/api/openai", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ messages: [{ role: "user", content: `User Query: ${query} \nTask: Return a list of function names that are the most relevant to the user query. Here is the list of functions and their description: ${JSON.stringify(endpoints)}` }], format: { relevantFunctions: "string[]" }, model }),
+        body: JSON.stringify(
+            {
+                messages: concatMessages({
+                    role: "user",
+                    content: `${JSON.stringify(endpoints)}\nThe above is a list of functions and their description. \n
+                    Here is the user query: ${query} \nReturn the functions that answers the user query. `
+                }, pastMessages),
+                format: { relevantFunctions: "string[]" },
+                model
+            }
+        ),
     });
     const data = await response.json();
 
@@ -65,13 +81,20 @@ export async function getRelevantEndpoints(query: string, model?: string) {
 }
 
 // 2-a: determine whether to search the internet or not
-export async function determineInternetUse(query: string, model?: string) {
+export async function determineInternetUse(query: string, model?: string, pastMessages?: { role: string; content: string; }[]) {
     const response = await fetch("/api/openai", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ messages: [{ role: "user", content: `User Query: ${query} \nTask: Based on the user query, determine whether searching the internet would benefit your answer or not.` }], format: { searchInternet: "boolean" }, model }),
+        body: JSON.stringify({
+            messages: concatMessages({
+                role: "user",
+                content: `User Query: ${query} \nTask: Based on the user query, determine whether searching the internet would benefit your answer or not.`
+            }, pastMessages),
+            format: { searchInternet: "boolean" },
+            model
+        }),
     });
     const data = await response.json();
 
@@ -84,13 +107,102 @@ export async function determineInternetUse(query: string, model?: string) {
 }
 
 // 3-a: call the perplexity endpoint
-export async function askPerplexity() { }
+export async function askPerplexity(query: string, model?: string, pastMessages?: { role: string; content: string; }[]) {
+    const response = await fetch("/api/perplexity", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            model: model || "sonar-pro",
+            messages: concatMessages(
+                {
+                    role: "user",
+                    content: `User Query: ${query} \nTask: Research about the user query and list out the related facts.`
+                },
+                pastMessages
+            )
+        }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+        return data.choices[0].message.content;
+    }
+    else {
+        console.error("Error from Perplexity API:", data);
+    }
+}
 
 // 2-b: use gpt function calling to decide which fmp endpoint to call
-export async function getFmpEndpoints() { }
+export async function prepareCallingFMP(query: string, toolNames: string[], model?: string, pastMessages?: { role: string; content: string; }[]) {
+    // collect the tools info for openai to digest
+    const tools: Tool[] = [];
+    for (const key of toolNames) {
+        tools.push(
+            {
+                type: "function",
+                function: {
+                    name: key,
+                    description: API_CONFIG[key].description,
+                    parameters: {
+                        type: "object",
+                        properties: Object.fromEntries(
+                            API_CONFIG[key].queryParams.map((param) => [
+                                param,
+                                {
+                                    type: PARAM_DESCRIPTIONS[param].type === "date" ? "string" : PARAM_DESCRIPTIONS[param].type,
+                                    description: PARAM_DESCRIPTIONS[param].description,
+                                },
+                            ])
+                        ),
+                        required: API_CONFIG[key].required,
+                        additionalProperties: false
+                    }
+                }
+            }
+        );
+    }
+
+    console.log(tools);
+
+    const response = await fetch("/api/openai", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+            {
+                messages: concatMessages({
+                    role: "user",
+                    content: `User Query: ${query} \nTask: Call the function(s) that will most likely provide the data needed to answer the user query.`
+                }, pastMessages),
+                tools,
+                model
+            }
+        ),
+    });
+    const data = await response.json();
+
+    if (response.ok) {
+        return JSON.parse(data.choices[0].message.tool_calls);
+    }
+    else {
+        console.error("Error from OpenAI API:", data);
+    }
+}
 
 // 3-b: call the relevant endpoints to get relevant data
-export async function callFmpEndpoints() { }
+export async function callFmpEndpoints(toolCalls: { function: { arguments: Record<string, string>, name: string }, id: string, type: string }[]) {
+    //   const res = await fetch("/api/fmp?type=fmpArticles&page=1&limit=5");
+    //   const data = await res.json();
+    //   console.log(data);
+    for(const toolCall of toolCalls) {
+        const response = await fetch(`/api/fmp?type=${toolCall.function.name}&${new URLSearchParams(toolCall.function.arguments).toString()}`);
+        const data = await response.json();
+        console.log(data);
+    }
+}
 
 // end step: send the data and the query to gpt to get a response
-export async function getResponse() { }
+export async function getResponse() { } 
