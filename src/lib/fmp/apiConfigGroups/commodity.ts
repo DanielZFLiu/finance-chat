@@ -1,4 +1,4 @@
-import { BASE_URL, apiConfigInterface, paramDescriptionInterface } from "../apiConstant";
+import { BASE_URL, BASE_URL_V3, apiConfigInterface, paramDescriptionInterface } from "../apiConstant";
 
 export const commodityConfig: apiConfigInterface = {
     commoditiesList: {
@@ -8,19 +8,50 @@ export const commodityConfig: apiConfigInterface = {
         description:
             "Access an extensive list of tracked commodities across various sectors, including energy, metals, and agricultural products. The FMP Commodities List API provides essential data on tradable commodities, giving investors the ability to explore market options in real-time."
     },
-    commoditiesQuote: {
-        endpoint: `${BASE_URL}/quote`,
-        queryParams: ["symbol"],
-        required: ["symbol"],
+    // commoditiesQuote: {
+    //     endpoint: `${BASE_URL}/quote`,
+    //     queryParams: ["symbol"],
+    //     required: ["symbol"],
+    //     description:
+    //         "Access real-time price quotes for all commodities traded worldwide with the FMP Global Commodities Quotes API. Track market movements and identify investment opportunities with comprehensive price data."
+    // },
+    // commoditiesQuoteShort: {
+    //     endpoint: `${BASE_URL}/quote-short`,
+    //     queryParams: ["symbol"],
+    //     required: ["symbol"],
+    //     description:
+    //         "Get fast and accurate quotes for commodities with the FMP Commodities Quick Quote API. Instantly access the current price, recent changes, and trading volume for various commodities in real-time."
+    // },
+    fullCommodityQuoteList: {
+        endpoint: `${BASE_URL_V3}/quotes/commodity`,
+        queryParams: [],
+        required: [],
         description:
-            "Access real-time price quotes for all commodities traded worldwide with the FMP Global Commodities Quotes API. Track market movements and identify investment opportunities with comprehensive price data."
+            "Provides a list of all quotes for all commodities that are traded on exchanges around the world."
     },
-    commoditiesQuoteShort: {
-        endpoint: `${BASE_URL}/quote-short`,
-        queryParams: ["symbol"],
+    fullCommodityQuote: {
+        endpoint: `${BASE_URL_V3}/quote`,
+        pathParams: ["symbol"],
+        queryParams: [],
         required: ["symbol"],
         description:
-            "Get fast and accurate quotes for commodities with the FMP Commodities Quick Quote API. Instantly access the current price, recent changes, and trading volume for various commodities in real-time."
+            "Provides real-time quotes for a specific commodity using its symbol. Example: symbol=ZOUSX."
+    },
+    intradayCommodityData: {
+        endpoint: `${BASE_URL_V3}/historical-chart/:timeframe/:symbol`,
+        pathParams: ["timeframe", "symbol"],
+        queryParams: ["from", "to"],
+        required: ["timeframe", "symbol", "from", "to"],
+        description:
+            "Provides intraday price data for a commodity over a specified date range. The 'timeframe' parameter determines the interval (e.g., 1min, 5min, 15min, 30min, 1hour, 4hour), while 'from' and 'to' set the date range."
+    },
+    commodityDailyData: {
+        endpoint: `${BASE_URL_V3}/historical-price-full/:symbol`,
+        pathParams: ["symbol"],
+        queryParams: [],
+        required: ["symbol"],
+        description:
+            "Provides daily historical price data for a commodity, including open, high, low, close prices, and volume."
     },
     realTimeBatchCommoditiesQuotes: {
         endpoint: `${BASE_URL}/batch-commodity-quotes`,
@@ -70,6 +101,10 @@ export const commodityParam: paramDescriptionInterface = {
     symbol: {
         type: "string",
         description: "Example: GCUSD"
+    },
+    timeframe: {
+        type: "string",
+        description: "Interval for intraday data. Valid options: 1min, 5min, 15min, 30min, 1hour, 4hour"
     },
     from: {
         type: "date",

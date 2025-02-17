@@ -1,4 +1,4 @@
-import { BASE_URL, apiConfigInterface, paramDescriptionInterface } from "../apiConstant";
+import { BASE_URL, today, apiConfigInterface, paramDescriptionInterface } from "../apiConstant";
 
 export const indexConfig: apiConfigInterface = {
     stockMarketIndexesList: {
@@ -13,14 +13,14 @@ export const indexConfig: apiConfigInterface = {
         queryParams: ["symbol"],
         required: ["symbol"],
         description:
-            "Access real-time stock index quotes with the Stock Index Quote API. Stay updated with the latest price changes, daily highs and lows, volume, and other key metrics for major stock indices around the world."
+            "Access real-time stock index quotes with the Stock Index Quote API. Stay updated with the latest price changes, daily highs and lows, volume, and other key metrics for major stock indices around the world. Symbol Limited to ^GSPC, ^DJI, ^IXIC, ^RUT, ^FTSE, ^N225, ^HSI, ^STOXX50E, ^VIX."
     },
     stockIndexShortQuote: {
         endpoint: `${BASE_URL}/quote-short`,
         queryParams: ["symbol"],
         required: ["symbol"],
         description:
-            "Access concise stock index quotes with the Stock Index Short Quote API. This API provides a snapshot of the current price, change, and volume for stock indexes, making it ideal for a quick overview of market movements."
+            "Access concise stock index quotes with the Stock Index Short Quote API. This API provides a snapshot of the current price, change, and volume for stock indexes, making it ideal for a quick overview of market movements. Symbol Limited to ^GSPC, ^DJI, ^IXIC, ^RUT, ^FTSE, ^N225, ^HSI, ^STOXX50E, ^VIX"
     },
     allIndexQuotes: {
         endpoint: `${BASE_URL}/batch-index-quotes`,
@@ -48,14 +48,14 @@ export const indexConfig: apiConfigInterface = {
         queryParams: ["symbol", "from", "to"],
         required: ["symbol", "from", "to"],
         description:
-            "Retrieve 1-minute interval intraday data for stock indexes using the Intraday 1-Minute Price Data API. Ideal for tracking short-term price movements and trading volume."
+            `Retrieve 1-minute interval intraday data for stock indexes using the Intraday 1-Minute Price Data API. Ideal for tracking short-term price movements and trading volume Notice that you may only Retrieve historical values up to 1 quarter; today's date is ${today}.`
     },
     intraday5MinPriceData: {
         endpoint: `${BASE_URL}/historical-chart/5min`,
         queryParams: ["symbol", "from", "to"],
         required: ["symbol", "from", "to"],
         description:
-            "Retrieve 5-minute interval intraday price data for stock indexes using the Intraday 5-Minute Price Data API. Get insights into price movements and trading volume in 5-minute windows."
+            `Retrieve 5-minute interval intraday price data for stock indexes using the Intraday 5-Minute Price Data API. Get insights into price movements and trading volume in 5-minute windows. Notice that you may only Retrieve historical values up to 1 quarter; today's date is ${today}.`
     },
     intraday1HourPriceData: {
         endpoint: `${BASE_URL}/historical-chart/1hour`,

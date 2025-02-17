@@ -1,5 +1,4 @@
 /**
- * quality, time, and cost
  * The pipeline for the finance chat:
  * 1. Send the users query and the list of fmp endpoints to gpt. Gpt will return a list of the
  * most relevant endpoints.
@@ -13,15 +12,12 @@
  * Possibility b:
  * 2-b. If list is non empty, use gpt function calling to decide which fmp endpoint(s) to call
  * 3-b. Call the relevant endpoints to get relevant data
- * 4-b. If gpt determines that the data was not enough, call the perplexity endpoint to get more 
- * relevant info.
+ * 4-b. If gpt determines that the data was not enough, iterate through other relevant endpoints.
  * 
  * End Step:
  * Send the data and the query to gpt to get a response.
  */
-
-import { API_CONFIG, PARAM_DESCRIPTIONS } from "@/lib/fmp/apiConfig";
-import { Tool } from "./openai/apiUtilities";
+import { Tool, getTools, getEndpointDescriptions } from "./openai/apiUtilities";
 
 // helper functions
 function concatMessages(message: { role: string; content: string; }, pastMessages?: { role: string; content: string; }[]) {
@@ -29,29 +25,6 @@ function concatMessages(message: { role: string; content: string; }, pastMessage
 }
 
 // 1: get relevant fmp endpoints
-interface endpoint {
-    name: string,
-    description: string,
-    parameters: {
-        name: string,
-        type: string,
-        description: string
-    }[]
-};
-const endpoints: endpoint[] = [];
-
-for (const key in API_CONFIG) {
-    endpoints.push({
-        name: key,
-        description: API_CONFIG[key].description,
-        parameters: API_CONFIG[key].queryParams.map((param) => ({
-            name: param,
-            type: PARAM_DESCRIPTIONS[param].type,
-            description: PARAM_DESCRIPTIONS[param].description,
-        })),
-    });
-}
-
 export async function getRelevantEndpoints(query: string, model?: string, pastMessages?: { role: string; content: string; }[]) {
     const response = await fetch("/api/openai", {
         method: "POST",
@@ -62,7 +35,7 @@ export async function getRelevantEndpoints(query: string, model?: string, pastMe
             {
                 messages: concatMessages({
                     role: "user",
-                    content: `${JSON.stringify(endpoints)}\nThe above is a list of functions and their description. \n
+                    content: `${JSON.stringify(getEndpointDescriptions())}\nThe above is a list of functions and their description. \n
                     Here is the user query: ${query} \nReturn the functions that answers the user query. `
                 }, pastMessages),
                 format: { relevantFunctions: "string[]" },
@@ -118,7 +91,7 @@ export async function askPerplexity(query: string, model?: string, pastMessages?
             messages: concatMessages(
                 {
                     role: "user",
-                    content: `User Query: ${query} \nTask: Research about the user query and list out the related facts.`
+                    content: `User Query: ${query} \nTask: Research about the user query.`
                 },
                 pastMessages
             )
@@ -137,32 +110,7 @@ export async function askPerplexity(query: string, model?: string, pastMessages?
 // 2-b: use gpt function calling to decide which fmp endpoint to call
 export async function prepareCallingFMP(query: string, toolNames: string[], model?: string, pastMessages?: { role: string; content: string; }[]) {
     // collect the tools info for openai to digest
-    const tools: Tool[] = [];
-    for (const key of toolNames) {
-        tools.push(
-            {
-                type: "function",
-                function: {
-                    name: key,
-                    description: API_CONFIG[key].description,
-                    parameters: {
-                        type: "object",
-                        properties: Object.fromEntries(
-                            API_CONFIG[key].queryParams.map((param) => [
-                                param,
-                                {
-                                    type: PARAM_DESCRIPTIONS[param].type === "date" ? "string" : PARAM_DESCRIPTIONS[param].type,
-                                    description: PARAM_DESCRIPTIONS[param].description,
-                                },
-                            ])
-                        ),
-                        required: API_CONFIG[key].required,
-                        additionalProperties: false
-                    }
-                }
-            }
-        );
-    }
+    const tools: Tool[] = getTools(toolNames);
 
     console.log(tools);
 
@@ -175,7 +123,7 @@ export async function prepareCallingFMP(query: string, toolNames: string[], mode
             {
                 messages: concatMessages({
                     role: "user",
-                    content: `User Query: ${query} \nTask: Call the function(s) that will most likely provide the data needed to answer the user query.`
+                    content: `User Query: ${query} \nTask: Call the function(s) that will most likely provide the data needed to answer the user query. You are encouraged to call more than one function to gather the needed information.`
                 }, pastMessages),
                 tools,
                 model

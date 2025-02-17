@@ -6,7 +6,7 @@ export const newsConfig: apiConfigInterface = {
         queryParams: ["page", "limit"],
         required: [],
         description:
-            "Access the latest articles from Financial Modeling Prep with the FMP Articles API. Get comprehensive updates including headlines, snippets, and publication URLs."
+            "Access the latest articles from Financial Modeling Prep with the FMP Articles API. Get comprehensive updates including headlines, snippets, and publication URLs. The parameter page cannot be 0."
     },
     generalNews: {
         endpoint: `${BASE_URL}/news/general-latest`,

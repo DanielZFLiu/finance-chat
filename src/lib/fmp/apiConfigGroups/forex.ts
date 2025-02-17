@@ -1,13 +1,13 @@
 import { BASE_URL, apiConfigInterface, paramDescriptionInterface } from "../apiConstant";
 
 export const forexConfig: apiConfigInterface = {
-    forexCurrencyPairs: {
-        endpoint: `${BASE_URL}/forex-list`,
-        queryParams: [],
-        required: [],
-        description:
-            "Access a comprehensive list of all currency pairs traded on the forex market with the FMP Forex Currency Pairs API. Analyze and track the performance of currency pairs to make informed investment decisions."
-    },
+    // forexCurrencyPairs: {
+    //     endpoint: `${BASE_URL}/forex-list`,
+    //     queryParams: [],
+    //     required: [],
+    //     description:
+    //         "Access a comprehensive list of all currency pairs traded on the forex market with the FMP Forex Currency Pairs API. Analyze and track the performance of currency pairs to make informed investment decisions."
+    // },
     forexQuote: {
         endpoint: `${BASE_URL}/quote`,
         queryParams: ["symbol"],

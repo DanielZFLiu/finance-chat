@@ -27,7 +27,21 @@ export async function fetchWrapper(type: string, params: Record<string, string>)
     const config = API_CONFIG[type as keyof typeof API_CONFIG];
     if (!config) throw new Error(`Invalid API type: ${type}`);
 
-    const endpoint = config.endpoint;
+    let endpoint = config.endpoint;
+
+    // collect path parameters
+    if (config.pathParams) {
+        for (const pathParam of config.pathParams) {
+            if (params[pathParam] === undefined) {
+                throw new Error(`Missing required path parameter: ${pathParam}`);
+            }
+            checkParamType(pathParam, params[pathParam]);
+            // append path parameter
+            endpoint += `/${encodeURIComponent(params[pathParam])}`;
+            // remove path param from params
+            delete params[pathParam];
+        }
+    }
 
     // collect query parameters
     const queryParams: Record<string, string> = {};
@@ -47,6 +61,7 @@ export async function fetchWrapper(type: string, params: Record<string, string>)
     // construct URL
     const urlParams = new URLSearchParams(queryParams).toString();
     const url = `${endpoint}?${urlParams}`;
+    console.log(url);
 
     try {
         const response = await fetch(url);

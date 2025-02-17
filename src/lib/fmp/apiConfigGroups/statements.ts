@@ -22,34 +22,6 @@ export const statementsConfig: apiConfigInterface = {
         description:
             "Gain insights into a company's cash flow activities with the Cash Flow Statements API. Analyze cash generated and used from operations, investments, and financing activities to evaluate the financial health and sustainability of a business."
     },
-    latestFinancialStatements: {
-        endpoint: `${BASE_URL}/latest-financial-statements`,
-        queryParams: [],
-        required: [],
-        description:
-            "Retrieve the latest financial statements across companies with the FMP Latest Financial Statements API."
-    },
-    incomeStatementsTTM: {
-        endpoint: `${BASE_URL}/income-statement-ttm`,
-        queryParams: ["symbol", "limit"],
-        required: ["symbol"],
-        description:
-            "Access trailing twelve-month (TTM) income statement data with the FMP Income Statements TTM API for comprehensive financial insights."
-    },
-    balanceSheetStatementsTTM: {
-        endpoint: `${BASE_URL}/balance-sheet-statement-ttm`,
-        queryParams: ["symbol", "limit"],
-        required: ["symbol"],
-        description:
-            "Access trailing twelve-month (TTM) balance sheet data with the FMP Balance Sheet Statements TTM API to evaluate a company's financial position over the past year."
-    },
-    cashFlowStatementsTTM: {
-        endpoint: `${BASE_URL}/cash-flow-statement-ttm`,
-        queryParams: ["symbol", "limit"],
-        required: ["symbol"],
-        description:
-            "Access trailing twelve-month (TTM) cash flow statement data with the FMP Cashflow Statements TTM API to analyze cash flows over the past year."
-    },
     keyMetrics: {
         endpoint: `${BASE_URL}/key-metrics`,
         queryParams: ["symbol", "limit", "period"],

@@ -1,12 +1,20 @@
-import { BASE_URL, apiConfigInterface, paramDescriptionInterface } from "../apiConstant";
+import { BASE_URL, BASE_URL_V3, apiConfigInterface, paramDescriptionInterface } from "../apiConstant";
 
 export const analystConfig: apiConfigInterface = {
-    financialEstimates: {
-        endpoint: `${BASE_URL}/analyst-estimates`,
-        queryParams: ["symbol", "period", "page", "limit"],
+    // financialEstimates: {
+    //     endpoint: `${BASE_URL}/analyst-estimates`,
+    //     queryParams: ["symbol", "period", "page", "limit"],
+    //     required: ["symbol"],
+    //     description:
+    //         "Retrieve analyst financial estimates for stock symbols with the FMP Financial Estimates API. Access projected figures like revenue, earnings per share (EPS), and other key financial metrics as forecasted by industry analysts to inform your investment decisions."
+    // },
+    analystEstimates:{
+        endpoint: `${BASE_URL_V3}/analyst-estimates`,
+        queryParams: ["period", "Limit"],
+        pathParams: ["symbol"],
         required: ["symbol"],
         description:
-            "Retrieve analyst financial estimates for stock symbols with the FMP Financial Estimates API. Access projected figures like revenue, earnings per share (EPS), and other key financial metrics as forecasted by industry analysts to inform your investment decisions."
+            "The FMP Analyst Estimates endpoint provides analyst estimates for a company's future earnings and revenue. Investors can use this information to get a sense of what analysts expect from a company and to identify potential investment opportunities."
     },
     ratingsSnapshot: {
         endpoint: `${BASE_URL}/ratings-snapshot`,
@@ -50,12 +58,20 @@ export const analystConfig: apiConfigInterface = {
         description:
             "Stay updated with the most recent analyst price target updates for all stock symbols using the FMP Price Target Latest News API. Get access to detailed forecasts, stock prices at the time of the update, analyst insights, and direct links to news sources for deeper analysis."
     },
+    // stockGrades: {
+    //     endpoint: `${BASE_URL}/grades`,
+    //     queryParams: ["symbol"],
+    //     required: ["symbol"],
+    //     description:
+    //         "Access the latest stock grades from top analysts and financial institutions with the FMP Grades API. Track grading actions, such as upgrades, downgrades, or maintained ratings, for specific stock symbols, providing valuable insight into how experts evaluate companies over time."
+    // },
     stockGrades: {
-        endpoint: `${BASE_URL}/grades`,
-        queryParams: ["symbol"],
+        endpoint: `${BASE_URL_V3}/grade`,
+        queryParams: ["limit"],
+        pathParams: ["symbol"],
         required: ["symbol"],
         description:
-            "Access the latest stock grades from top analysts and financial institutions with the FMP Grades API. Track grading actions, such as upgrades, downgrades, or maintained ratings, for specific stock symbols, providing valuable insight into how experts evaluate companies over time."
+            "Get a sense of how professional investors view a company with our Stock Grade endpoint. This endpoint provides a rating of a company given by hedge funds, investment firms, and analysts."
     },
     historicalStockGrades: {
         endpoint: `${BASE_URL}/grades-historical`,
@@ -103,5 +119,9 @@ export const analystParam: paramDescriptionInterface = {
     limit: {
         type: "number",
         description: "Example: 10"
+    },
+    Limit: {
+        type: "number",
+        description: "Example: 30"
     }
 };

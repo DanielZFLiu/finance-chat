@@ -1,4 +1,4 @@
-import { BASE_URL, apiConfigInterface, paramDescriptionInterface } from "../apiConstant";
+import { BASE_URL, BASE_URL_V4, apiConfigInterface, paramDescriptionInterface } from "../apiConstant";
 
 export const companyConfig: apiConfigInterface = {
     companyProfileData: {
@@ -106,19 +106,33 @@ export const companyConfig: apiConfigInterface = {
         description:
             "Retrieve detailed information on company executives with the FMP Company Executives API. Access essential data about key executives including their name, title, compensation, and demographic details."
     },
+    // executiveCompensation: {
+    //     endpoint: `${BASE_URL}/governance-executive-compensation`,
+    //     queryParams: ["symbol"],
+    //     required: ["symbol"],
+    //     description:
+    //         "Retrieve comprehensive compensation data for company executives with the FMP Executive Compensation API. Access detailed information on salaries, stock awards, total compensation, and other financial data along with filing details and links to official documents."
+    // },
     executiveCompensation: {
-        endpoint: `${BASE_URL}/governance-executive-compensation`,
+        endpoint: `${BASE_URL_V4}/governance/executive_compensation`,
         queryParams: ["symbol"],
         required: ["symbol"],
         description:
-            "Retrieve comprehensive compensation data for company executives with the FMP Executive Compensation API. Access detailed information on salaries, stock awards, total compensation, and other financial data along with filing details and links to official documents."
+            "Understand how a company compensates its executives with our Executive Compensation endpoint. This endpoint provides information such as salary, bonus, and stock options for each executive."
     },
+    // executiveCompensationBenchmark: {
+    //     endpoint: `${BASE_URL}/executive-compensation-benchmark`,
+    //     queryParams: ["year"],
+    //     required: ["year"],
+    //     description:
+    //         "Gain access to average executive compensation data across various industries with the FMP Executive Compensation Benchmark API. Compare executive pay by industry and understand compensation trends and benchmarks."
+    // },
     executiveCompensationBenchmark: {
-        endpoint: `${BASE_URL}/executive-compensation-benchmark`,
+        endpoint: `${BASE_URL_V4}/executive-compensation-benchmark`,
         queryParams: ["year"],
         required: ["year"],
         description:
-            "Gain access to average executive compensation data across various industries with the FMP Executive Compensation Benchmark API. Compare executive pay by industry and understand compensation trends and benchmarks."
+            "Compare a company's executive compensation to other companies in the same industry with our Compensation Benchmark endpoint. This endpoint can help you understand how competitive a company's executive compensation is."
     }
 };
 

@@ -1,13 +1,13 @@
 import { BASE_URL, apiConfigInterface, paramDescriptionInterface } from "../apiConstant";
 
 export const cryptoConfig: apiConfigInterface = {
-    cryptocurrencyList: {
-        endpoint: `${BASE_URL}/cryptocurrency-list`,
-        queryParams: [],
-        required: [],
-        description:
-            "Access a comprehensive list of all cryptocurrencies traded on exchanges worldwide with the FMP Cryptocurrencies Overview API. Get detailed information on each cryptocurrency to inform your investment strategies."
-    },
+    // cryptocurrencyList: {
+    //     endpoint: `${BASE_URL}/cryptocurrency-list`,
+    //     queryParams: [],
+    //     required: [],
+    //     description:
+    //         "Access a comprehensive list of all cryptocurrencies traded on exchanges worldwide with the FMP Cryptocurrencies Overview API. Get detailed information on each cryptocurrency to inform your investment strategies."
+    // },
     fullCryptoQuote: {
         endpoint: `${BASE_URL}/quote`,
         queryParams: ["symbol"],
