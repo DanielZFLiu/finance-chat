@@ -185,7 +185,7 @@ export async function prepareCallingFMP(query: string, toolNames: string[], mode
     const data = await response.json();
 
     if (response.ok) {
-        return JSON.parse(data.choices[0].message.tool_calls);
+        return data.response.choices[0].message.tool_calls;
     }
     else {
         console.error("Error from OpenAI API:", data);
@@ -193,16 +193,52 @@ export async function prepareCallingFMP(query: string, toolNames: string[], mode
 }
 
 // 3-b: call the relevant endpoints to get relevant data
-export async function callFmpEndpoints(toolCalls: { function: { arguments: Record<string, string>, name: string }, id: string, type: string }[]) {
-    //   const res = await fetch("/api/fmp?type=fmpArticles&page=1&limit=5");
-    //   const data = await res.json();
-    //   console.log(data);
-    for(const toolCall of toolCalls) {
-        const response = await fetch(`/api/fmp?type=${toolCall.function.name}&${new URLSearchParams(toolCall.function.arguments).toString()}`);
+export async function callFmpEndpoints(toolCalls: { function: { arguments: string, name: string }, id: string, type: string }[]) {
+    const responses = [];
+    for (const toolCall of toolCalls) {
+        const response = await fetch(`/api/fmp?type=${toolCall.function.name}&${new URLSearchParams(JSON.parse(toolCall.function.arguments)).toString()}`);
         const data = await response.json();
-        console.log(data);
+
+        if (response.ok) {
+            responses.push(data);
+        }
+        else {
+            console.error("Error from FMP API:", data);
+        }
     }
+    return responses;
 }
 
 // end step: send the data and the query to gpt to get a response
-export async function getResponse() { } 
+export async function getResponse(query: string, relevantData: string, checkMoreInfo: boolean, model?: string, pastMessages?: { role: string; content: string; }[]) {
+    const prompt = checkMoreInfo ? 
+        "If the information above is enough to answer the question, answer within response and set moreInfo to false.\n\
+        If the information above is not enough to answer the question, set moreInfo to true and leave response empty." 
+        : "Answer the user query using the relevant information provided above.";
+    const format = checkMoreInfo ? { response: "string", moreInfo: "boolean" } : undefined;
+
+    const response = await fetch("/api/openai", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+            {
+                messages: concatMessages({
+                    role: "user",
+                    content: `Relevant Information: ${relevantData} \nUser Query: ${query} \n${prompt}`
+                }, pastMessages),
+                format,
+                model
+            }
+        ),
+    });
+    const data = await response.json();
+
+    if (response.ok) {
+        return JSON.parse(data.response.choices[0].message.content);
+    }
+    else {
+        console.error("Error from OpenAI API:", data);
+    }
+} 

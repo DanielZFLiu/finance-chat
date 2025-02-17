@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-// import { determineInternetUse, getRelevantEndpoints, askPerplexity, prepareCallingFMP } from "@/lib/pipeline";
+// import { determineInternetUse, getRelevantEndpoints, askPerplexity, prepareCallingFMP, callFmpEndpoints } from "@/lib/pipeline";
 
 
 // test fmp api
@@ -34,12 +34,14 @@ import { useEffect } from "react";
 export default function Page() {
   useEffect(() => {
     const fetchData = async () => {
-      // const endpoints = await getRelevantEndpoints("What has Airbnb management said about profitability over the last few earnings calls?", "o3-mini");
+      // const endpoints = await getRelevantEndpoints("Summarize Spotify's latest conference call.", "o3-mini");
       // let relevantFunctions = endpoints.relevantFunctions;
       // console.log(relevantFunctions);
       // console.log(await determineInternetUse("What is the weather in london right now?"));
       // console.log(await askPerplexity("How big is the universe?"));
-      // console.log(await prepareCallingFMP("What has Airbnb management said about profitability over the last few earnings calls?", relevantFunctions, "o3-mini"));
+      // let functionCalls = await prepareCallingFMP("Summarize Spotify's latest conference call.", relevantFunctions, "o3-mini");
+      // console.log(functionCalls);
+      // console.log(await callFmpEndpoints(functionCalls));
     };
     fetchData();
   }, []);
