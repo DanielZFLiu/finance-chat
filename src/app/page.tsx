@@ -1,24 +1,7 @@
 "use client";
 import { useEffect } from "react";
-import { API_CONFIG, PARAM_DESCRIPTIONS } from "@/lib/fmp/apiConfig";
+// import { determineInternetUse, getRelevantEndpoints } from "@/lib/pipeline";
 
-interface Tool {
-  type: "function";
-  function: {
-    name: string;
-    description: string;
-    parameters: {
-      type: string;
-      properties: Record<string, { type: string; description: string }>;
-      required: string[];
-      additionalProperties: boolean;
-    };
-  };
-}
-
-const tools: Tool[] = [];
-
-const functions: any[] = []
 
 // test fmp api
 // async function fetchCompanyData() {
@@ -27,90 +10,34 @@ const functions: any[] = []
 //   console.log(data);
 // }
 
-// test openai api
-async function sendChat() {
-  const response = await fetch("/api/openai", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ message: `User Query: How do you define love? \nTask: Return a list of function names that are the most relevant to the user query. You can return a empty list if there are no relevant functions. Here is the list of functions and their description: ${JSON.stringify(functions)}`, formatted: true }),
-  });
-  const data = await response.json();
-  console.log(data);
-}
-
 // test perplexity api
-async function askPerplexity() {
-  const response = await fetch("/api/perplexity", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "sonar-pro",
-      messages: [
-        {
-          role: "user",
-          content: "How big is the universe?"
-        }
-      ]
-    }),
-  });
-  const data = await response.json();
-  console.log(data);
-}
+// async function askPerplexity() {
+//   const response = await fetch("/api/perplexity", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify({
+//       model: "sonar-pro",
+//       messages: [
+//         {
+//           role: "user",
+//           content: "How big is the universe?"
+//         }
+//       ]
+//     }),
+//   });
+//   const data = await response.json();
+//   console.log(data);
+// }
 
 export default function Page() {
   useEffect(() => {
-    for (const key in API_CONFIG) {
-      tools.push(
-        {
-          type: "function",
-          function: {
-            name: key,
-            description: API_CONFIG[key].description,
-            parameters: {
-              type: "object",
-              properties: Object.fromEntries(
-                API_CONFIG[key].queryParams.map((param) => [
-                  param,
-                  {
-                    type: PARAM_DESCRIPTIONS[param].type,
-                    description: PARAM_DESCRIPTIONS[param].description,
-                  },
-                ])
-              ),
-              required: API_CONFIG[key].required,
-              additionalProperties: false
-            }
-          }
-        }
-      );
-    }
-
-    for (const key in API_CONFIG) {
-      functions.push({
-        name: key,
-        description: API_CONFIG[key].description,
-        parameters: Object.fromEntries(
-          API_CONFIG[key].queryParams.map((param) => [
-            param,
-            {
-              type: PARAM_DESCRIPTIONS[param].type,
-              description: PARAM_DESCRIPTIONS[param].description,
-            },
-          ])
-        ),
-      });
-    }
-
-    // console.log(`User Query: Find the name of AAPL. \nTask: Return a list of function names that are the most relevant to the user query. Here is the list of functions and their description: ${JSON.stringify(functions)}`);
-
-
-    // fetchCompanyData();
-    // sendChat();
-    askPerplexity();
+    const fetchData = async () => {
+      // console.log(await getRelevantEndpoints("What are Mark Zuckerberg's and Satya Nadella's recent comments about AI?"));
+      // console.log(await determineInternetUse("What is the weather in london right now?"));
+    };
+    fetchData();
   }, []);
 
   return <div>Test</div>;

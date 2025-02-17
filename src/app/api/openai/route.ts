@@ -5,9 +5,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
-import { ChatCompletionCreateParams } from "openai/resources/chat/completions/completions";
-import { getResponseFormat, Tool, getMessages, addMessage } from "@/lib/openai/apiVariables";
-
+import { ChatCompletionCreateParams, ChatCompletionMessageParam } from "openai/resources/chat/completions/completions";
+import { Tool, buildZodSchema } from "@/lib/openai/apiUtilities";
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -15,27 +14,38 @@ const openai = new OpenAI({
 
 export async function POST(req: NextRequest) {
     try {
-        // JSON payload with message, tools, and formatted
+        // JSON payload with message, tools, and format
         const body = await req.json();
-        const { message, tools, formatted }: { message: string, tools: Tool[], formatted: boolean } = body;
+        const { messages, tools, format, model }: { messages: ChatCompletionMessageParam[], tools: Tool[], format: Record<string, string>, model: string } = body;
 
-        if (tools && formatted) {
+        if (tools && format) {
             return NextResponse.json(
-                { error: "Either provide 'tools' or set 'formatted' to true, not both." },
+                { error: "Either provide 'tools' or 'format', not both." },
                 { status: 400 }
             );
         }
 
-        addMessage({ role: "user", content: message });
         const params: ChatCompletionCreateParams = {
-            model: "gpt-4o",
-            messages: getMessages(),
+            model: model || "gpt-4o",
+            messages,
+            reasoning_effort: model ? "high" : undefined,
         }
 
         if (tools) {
             params.tools = tools;
-        } else if (formatted) {
-            params.response_format = zodResponseFormat(getResponseFormat(), "response_format");
+        }
+        else if (format) {
+            let schema;
+            try {
+                schema = buildZodSchema(format);
+            }
+            catch (err) {
+                return NextResponse.json(
+                    { error: `Invalid schema description: ${err instanceof Error ? err.message : err}` },
+                    { status: 400 }
+                );
+            }
+            params.response_format = zodResponseFormat(schema, "response_format");
         }
 
         const completion = await openai.chat.completions.create(params);
