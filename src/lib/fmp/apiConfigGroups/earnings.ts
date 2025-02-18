@@ -49,15 +49,15 @@ export const earningsParam: paramDescriptionInterface = {
         description: "Example: 100"
     },
     page: {
-        type: "string",
-        description: "Example: 0"
+        type: "number",
+        description: "Example: 1"
     },
     quarter: {
-        type: "string",
+        type: "number",
         description: "Example: 3"
     },
     year: {
-        type: "string",
+        type: "number",
         description: "Example: 2020"
     }
 };

@@ -48,7 +48,7 @@ export const fundraisersConfig: apiConfigInterface = {
 export const fundraisersParam: paramDescriptionInterface = {
     page: {
         type: "number",
-        description: "Example: 0"
+        description: "Example: 1"
     },
     limit: {
         type: "number",

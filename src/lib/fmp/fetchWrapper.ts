@@ -8,7 +8,7 @@ function checkParamType(key: string, value: string) {
     // validation functions
     const validators: Record<string, (val: string) => boolean> = {
         number: (val) => isNumeric(val),
-        string: (val) => !isNumeric(val),
+        string: () => true,
         boolean: (val) => val === "true" || val === "false",
         date: (val) => !isNaN(Date.parse(val)),
     };

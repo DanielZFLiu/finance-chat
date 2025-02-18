@@ -27,7 +27,7 @@ export const form13fConfig: apiConfigInterface = {
 export const form13fParam: paramDescriptionInterface = {
     page: {
         type: "number",
-        description: "Example: 0"
+        description: "Example: 1"
     },
     limit: {
         type: "number",
@@ -38,11 +38,11 @@ export const form13fParam: paramDescriptionInterface = {
         description: "Example: 0001388838"
     },
     year: {
-        type: "string",
+        type: "number",
         description: "Example: 2023"
     },
     quarter: {
-        type: "string",
+        type: "number",
         description: "Example: 3"
     },
     symbol: {

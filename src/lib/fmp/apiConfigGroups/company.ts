@@ -151,7 +151,7 @@ export const companyParam: paramDescriptionInterface = {
     },
     page: {
         type: "number",
-        description: "Example: 0"
+        description: "Example: 1"
     },
     from: {
         type: "date",
@@ -174,7 +174,7 @@ export const companyParam: paramDescriptionInterface = {
         description: "Example: TRUE"
     },
     year: {
-        type: "string",
+        type: "number",
         description: "Example: 2023"
     }
 };

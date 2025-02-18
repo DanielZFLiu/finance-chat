@@ -98,7 +98,7 @@ export const secParam: paramDescriptionInterface = {
     },
     page: {
         type: "number",
-        description: "Example: 0"
+        description: "Example: 1"
     },
     limit: {
         type: "number",

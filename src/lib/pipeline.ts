@@ -1,27 +1,27 @@
 /**
  * The pipeline for the finance chat:
- * 1. Send the users query and the list of fmp endpoints to gpt. Gpt will return a list of the
- * most relevant endpoints.
- * This is necessary as the max amount of tools thats accepted by gpt is 128, and we have ~250  
- * fmp endpoints. 
- * 
- * Possibility a:
- * 2-a. If list is empty, ask gpt to determine whether to search the internet or not (perplexity)
- * 3-a. If gpt says to search the internet, call the perplexity endpoint to get the relevant info
- * 
- * Possibility b:
- * 2-b. If list is non empty, use gpt function calling to decide which fmp endpoint(s) to call
- * 3-b. Call the relevant endpoints to get relevant data
- * 4-b. If gpt determines that the data was not enough, iterate through other relevant endpoints.
- * 
- * End Step:
- * Send the data and the query to gpt to get a response.
+ * 1. Get list of relevant fmp endpoints
+ * 2. Determine whether to search the internet or not (search if relevant fmp endpoints list is empty)
+ * 3. Prepare calling fmp endpoints using list of relevant fmp endpoints
+ * 4. Call the relevant fmp endpoints
+ * 5. Get response
+ * 6. If data not sufficient for response, remove called endpoint(s) from list of relevant fmp endpoints; go back to step 2. Else return response.
  */
 import { Tool, getTools, getEndpointDescriptions } from "./openai/apiUtilities";
+import { Dispatch, SetStateAction } from "react";
+import { today } from "./fmp/apiConstant";
 
 // helper functions
 function concatMessages(message: { role: string; content: string; }, pastMessages?: { role: string; content: string; }[]) {
     return (pastMessages ? pastMessages : []).concat([message]);
+}
+
+function getStucturedOutput(data: { response: { choices: { message: { content: string, refusal: string } }[] } }) {
+    if (data.response.choices[0].message.content) {
+        return data.response.choices[0].message.content;
+    } else {
+        return data.response.choices[0].message.refusal;
+    }
 }
 
 // 1: get relevant fmp endpoints
@@ -36,7 +36,7 @@ export async function getRelevantEndpoints(query: string, model?: string, pastMe
                 messages: concatMessages({
                     role: "user",
                     content: `${JSON.stringify(getEndpointDescriptions())}\nThe above is a list of functions and their description. \n
-                    Here is the user query: ${query} \nReturn the functions that answers the user query. `
+                    Here is the user query: ${query} \nReturn the function names (value of the key 'name') that answers the user query. `
                 }, pastMessages),
                 format: { relevantFunctions: "string[]" },
                 model
@@ -44,16 +44,17 @@ export async function getRelevantEndpoints(query: string, model?: string, pastMe
         ),
     });
     const data = await response.json();
+    const structuredOutput = getStucturedOutput(data);
 
     if (response.ok) {
-        return JSON.parse(data.response.choices[0].message.content);
+        return structuredOutput ? JSON.parse(structuredOutput) : { relevantFunctions: [] };
     }
     else {
         console.error("Error from OpenAI API:", data);
     }
 }
 
-// 2-a: determine whether to search the internet or not
+// 2. determine whether to search the internet or not
 export async function determineInternetUse(query: string, model?: string, pastMessages?: { role: string; content: string; }[]) {
     const response = await fetch("/api/openai", {
         method: "POST",
@@ -70,16 +71,17 @@ export async function determineInternetUse(query: string, model?: string, pastMe
         }),
     });
     const data = await response.json();
+    const structuredOutput = getStucturedOutput(data);
 
     if (response.ok) {
-        return JSON.parse(data.response.choices[0].message.content);
+        return structuredOutput ? JSON.parse(structuredOutput) : { searchInternet: false };
     }
     else {
         console.error("Error from OpenAI API:", data);
     }
 }
 
-// 3-a: call the perplexity endpoint
+// 2. search the internet
 export async function askPerplexity(query: string, model?: string, pastMessages?: { role: string; content: string; }[]) {
     const response = await fetch("/api/perplexity", {
         method: "POST",
@@ -91,7 +93,7 @@ export async function askPerplexity(query: string, model?: string, pastMessages?
             messages: concatMessages(
                 {
                     role: "user",
-                    content: `User Query: ${query} \nTask: Research about the user query.`
+                    content: `User Query: ${query} \nTask: Research about the user query. Try to list out as much details as possible relevant to the query.`
                 },
                 pastMessages
             )
@@ -107,7 +109,7 @@ export async function askPerplexity(query: string, model?: string, pastMessages?
     }
 }
 
-// 2-b: use gpt function calling to decide which fmp endpoint to call
+// 3. prepare calling fmp endpoints
 export async function prepareCallingFMP(query: string, toolNames: string[], model?: string, pastMessages?: { role: string; content: string; }[]) {
     // collect the tools info for openai to digest
     const tools: Tool[] = getTools(toolNames);
@@ -123,7 +125,7 @@ export async function prepareCallingFMP(query: string, toolNames: string[], mode
             {
                 messages: concatMessages({
                     role: "user",
-                    content: `User Query: ${query} \nTask: Call the function(s) that will most likely provide the data needed to answer the user query. You are encouraged to call more than one function to gather the needed information.`
+                    content: `User Query: ${query} \nTask: Call the function(s) that will most likely provide the data needed to answer the user query. You are encouraged to call more than one function to gather the needed information. \nAdditional Information: Today's date is ${today}.`
                 }, pastMessages),
                 tools,
                 model
@@ -140,7 +142,7 @@ export async function prepareCallingFMP(query: string, toolNames: string[], mode
     }
 }
 
-// 3-b: call the relevant endpoints to get relevant data
+// 4. call the relevant fmp endpoints
 export async function callFmpEndpoints(toolCalls: { function: { arguments: string, name: string }, id: string, type: string }[]) {
     const responses = [];
     for (const toolCall of toolCalls) {
@@ -157,11 +159,11 @@ export async function callFmpEndpoints(toolCalls: { function: { arguments: strin
     return responses;
 }
 
-// end step: send the data and the query to gpt to get a response
+// 5. get response
 export async function getResponse(query: string, relevantData: string, checkMoreInfo: boolean, model?: string, pastMessages?: { role: string; content: string; }[]) {
-    const prompt = checkMoreInfo ? 
-        "If the information above is enough to answer the question, answer within response and set moreInfo to false.\n\
-        If the information above is not enough to answer the question, set moreInfo to true and leave response empty." 
+    const prompt = checkMoreInfo ?
+        "If the information above is enough to answer the user query, answer within response and set moreInfo to false.\n\
+        If the information above is not enough to answer the user query, keep all relevant information within response, then set moreInfo to true."
         : "Answer the user query using the relevant information provided above.";
     const format = checkMoreInfo ? { response: "string", moreInfo: "boolean" } : undefined;
 
@@ -183,10 +185,62 @@ export async function getResponse(query: string, relevantData: string, checkMore
     });
     const data = await response.json();
 
-    if (response.ok) {
-        return JSON.parse(data.response.choices[0].message.content);
+    if (response.ok && checkMoreInfo) {
+        const structuredOutput = getStucturedOutput(data);
+        return structuredOutput ? JSON.parse(structuredOutput) : { response: "", moreInfo: true };
+    }
+    else if (response.ok && !checkMoreInfo) {
+        return data.response.choices[0].message.content;
     }
     else {
         console.error("Error from OpenAI API:", data);
     }
-} 
+}
+
+// the entire pipeline
+export async function prompt(query: string, setProgress: Dispatch<SetStateAction<string>>, openaiModel?: string, perplexityModel?: string, pastMessages?: { role: string; content: string; }[]) {
+    // 1. get relevant fmp endpoints
+    const endpoints = await getRelevantEndpoints(query, openaiModel, pastMessages);
+    let relevantFunctions = endpoints.relevantFunctions;
+    console.log("step 1: list of relevant functions", relevantFunctions);
+
+    let relevantData = "";
+    while (true) {
+        // 2. potentially search the internet
+        if (relevantFunctions.length === 0) {
+            const internetUse = await determineInternetUse(query, openaiModel, pastMessages);
+            console.log("step 2-a: determine internet use:", internetUse);
+
+            if (internetUse) {
+                const perplexityResponse = await askPerplexity(query, perplexityModel, pastMessages);
+                relevantData += "Information from the internet: \n";
+                relevantData += perplexityResponse;
+                console.log("step 2-b: search the internet:", perplexityResponse);
+            }
+
+            return await getResponse(query, relevantData, false, openaiModel, pastMessages);
+        }
+
+        // 3. prepare calling fmp
+        const functionCalls = await prepareCallingFMP(query, relevantFunctions, openaiModel, pastMessages);
+        console.log("step 3: functions prepared:", functionCalls);
+
+        // 4. call the relevant endpoints
+        const fmpData = JSON.stringify(await callFmpEndpoints(functionCalls));
+        relevantData = "New Data:\n" + fmpData + "\nRelevant data from before: \n" + relevantData;
+        relevantFunctions = relevantFunctions.filter((func: string) => func !== functionCalls[0].function.name);
+        console.log("step 4: data retrieved from fmp:", relevantData);
+
+        // 5. get response
+        const response = await getResponse(query, relevantData, true, openaiModel, pastMessages);
+        console.log("step 5: get response:", response);
+
+        if (!response.moreInfo) {
+            return response.response;
+        }
+        // 6. if data not sufficient for response, iterate through other relevant endpoints
+        else if (response.moreInfo && relevantFunctions.length > 0) {
+            relevantData = response.response + "\n";
+        }
+    }
+}

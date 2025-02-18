@@ -21,6 +21,7 @@ export function getTools(toolNames: string[]) {
     const tools: Tool[] = [];
     for (const key of toolNames) {
         const config = API_CONFIG[key];
+        if (!config) continue;
 
         // get query properties
         const queryProperties = config.queryParams.map((param) => [
@@ -78,6 +79,7 @@ export function getEndpointDescriptions() {
 
     for (const key in API_CONFIG) {
         const config = API_CONFIG[key];
+        if (!config) continue;
 
         // Map query parameters.
         const queryParams = config.queryParams.map((param) => ({

@@ -43,13 +43,13 @@ export const directoryConfig: apiConfigInterface = {
         description:
             "List all actively trading companies and financial instruments with the FMP Actively Trading List API. Access real-time market activity for publicly traded securities."
     },
-    earningsTranscriptList: {
-        endpoint: `${BASE_URL}/earnings-transcript-list`,
-        queryParams: [],
-        required: [],
-        description:
-            "Access available earnings transcripts for companies with the FMP Earnings Transcript List API. Retrieve companies along with the count of available earnings transcripts."
-    },
+    // earningsTranscriptList: {
+    //     endpoint: `${BASE_URL}/earnings-transcript-list`,
+    //     queryParams: [],
+    //     required: [],
+    //     description:
+    //         "Access available earnings transcripts for companies with the FMP Earnings Transcript List API. Retrieve companies along with the count of available earnings transcripts."
+    // },
     availableExchanges: {
         endpoint: `${BASE_URL}/available-exchanges`,
         queryParams: [],

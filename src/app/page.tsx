@@ -1,6 +1,6 @@
 "use client";
-import { useEffect } from "react";
-import { determineInternetUse, getRelevantEndpoints, askPerplexity, prepareCallingFMP, callFmpEndpoints } from "@/lib/pipeline";
+import { useEffect, useState  } from "react";
+import { determineInternetUse, getRelevantEndpoints, askPerplexity, prepareCallingFMP, callFmpEndpoints, getResponse, prompt } from "@/lib/pipeline";
 
 
 // test fmp api
@@ -32,19 +32,27 @@ import { determineInternetUse, getRelevantEndpoints, askPerplexity, prepareCalli
 // }
 
 export default function Page() {
+  const [progress, setProgress] = useState("test");
+
   useEffect(() => {
     const fetchData = async () => {
-      const endpoints = await getRelevantEndpoints("Summarize Spotify's latest conference call. use earningsTranscript.", "o3-mini");
-      let relevantFunctions = endpoints.relevantFunctions;
-      console.log(relevantFunctions);
-      // console.log(await determineInternetUse("What is the weather in london right now?"));
-      // console.log(await askPerplexity("How big is the universe?"));
-      let functionCalls = await prepareCallingFMP("Summarize Spotify's latest conference call. use earningsTranscript.", relevantFunctions, "o3-mini");
-      console.log(functionCalls);
-      console.log(await callFmpEndpoints(functionCalls));
+      // let query = "Summarize Spotify's latest conference call. use earningsTranscript.";
+      // const endpoints = await getRelevantEndpoints(query);
+      // let relevantFunctions = endpoints.relevantFunctions;
+      // console.log(relevantFunctions);
+      // // console.log(await determineInternetUse("What is the weather in london right now?"));
+      // // console.log(await askPerplexity("How big is the universe?"));
+      // let functionCalls = await prepareCallingFMP(query, relevantFunctions);
+      // console.log(functionCalls);
+      // let relevantData = await callFmpEndpoints(functionCalls);
+      // console.log(relevantData);
+      // let response = await getResponse(query, JSON.stringify(relevantData), true);
+      // console.log(await prompt("What are Mark Zuckerberg's and Satya Nadella's recent comments about AI?", setProgress));
     };
     fetchData();
+    // prompt("Summarize Spotify's latest conference call. use earningsTranscript.", setProgress);
   }, []);
+ 
 
-  return <div>Test</div>;
+  return <div>{progress}</div>;
 }

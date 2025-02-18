@@ -1,4 +1,4 @@
-import { BASE_URL, BASE_URL_V4, apiConfigInterface, paramDescriptionInterface } from "../apiConstant";
+import { BASE_URL_V4, apiConfigInterface, paramDescriptionInterface } from "../apiConstant";
 
 export const esgConfig: apiConfigInterface = {
     // esgDisclosures: {
@@ -51,7 +51,7 @@ export const esgParam: paramDescriptionInterface = {
         description: "Example: AAPL"
     },
     year: {
-        type: "string",
+        type: "number",
         description: "Example: 2023"
     }
 };

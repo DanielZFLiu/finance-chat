@@ -63,7 +63,7 @@ export const stateParam: paramDescriptionInterface = {
     },
     page: {
         type: "number",
-        description: "Example: 0"
+        description: "Example: 1"
     },
     name: {
         type: "string",

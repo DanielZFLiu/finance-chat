@@ -76,7 +76,7 @@ export const newsConfig: apiConfigInterface = {
 export const newsParam: paramDescriptionInterface = {
     page: {
         type: "number",
-        description: "Example: 0"
+        description: "Example: 1"
     },
     limit: {
         type: "number",

@@ -114,6 +114,6 @@ export const calendarParam: paramDescriptionInterface = {
     },
     page: {
         type: "number",
-        description: "Example: 0"
-    }
+        description: "Example: 1"
+    },
 };
