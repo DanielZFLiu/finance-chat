@@ -1,4 +1,4 @@
-Finance chat is your financial assistant empowered by OpenAI, FMP, and Perplexity. Query about financial statistics or news at this [link](fmp-finchat.vercel.app/); have fun!
+Finance chat is your financial assistant empowered by OpenAI, FMP, and Perplexity. Query about financial statistics or news at this [link](https://fmp-finchat.vercel.app/); have fun!
 
 # Functionalities
 - The app has a unique tree view which allows user to view different branches of conversation. Play around with it to find out.
