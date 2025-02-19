@@ -163,10 +163,11 @@ export async function callFmpEndpoints(toolCalls: { function: { arguments: strin
 
 // 5. get response
 export async function getResponse(query: string, relevantData: string, checkMoreInfo: boolean, model?: string, pastMessages?: { role: string; content: string; }[]) {
-    const prompt = checkMoreInfo ?
+    let prompt = checkMoreInfo ?
         "If the information above is enough to answer the user query, answer within response and set moreInfo to false.\n\
         If the information above is not enough to answer the user query, keep all relevant information within response, then set moreInfo to true."
         : "Answer the user query using the relevant information provided above.";
+    prompt += "Avoid using the single dollar sign (unless you are writing inline latex) in response.";
     const format = checkMoreInfo ? { response: "string", moreInfo: "boolean" } : undefined;
 
     const response = await fetch("/api/openai", {
@@ -201,6 +202,7 @@ export async function getResponse(query: string, relevantData: string, checkMore
 
 // the entire pipeline
 export async function prompt(query: string, setProgress: Dispatch<SetStateAction<string>>, openaiModel?: string, perplexityModel?: string, pastMessages?: { role: string; content: string; }[]): Promise<string> {
+    console.log(openaiModel);
     // 1. get relevant fmp endpoints
     setProgress("Step 1: Getting relevant endpoints...");
     const endpoints = await getRelevantEndpoints(query, openaiModel, pastMessages);

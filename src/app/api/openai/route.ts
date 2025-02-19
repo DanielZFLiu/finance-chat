@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
         const params: ChatCompletionCreateParams = {
             model: model || "gpt-4o",
             messages,
-            reasoning_effort: model ? "high" : undefined,
+            reasoning_effort: model === "gpt-4o" ? undefined : "high",
         }
 
         if (tools) {

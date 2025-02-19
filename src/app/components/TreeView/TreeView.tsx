@@ -5,10 +5,12 @@ import './TreeView.css';
 
 interface D3TreeProps {
   tree: Tree;
-  // pass in a close tree view function
+  id: string;
+  setId: (newId: string) => void;
+  setView: (view: string) => void;
 }
 
-const D3Tree: React.FC<D3TreeProps> = ({ tree }) => {
+const D3Tree: React.FC<D3TreeProps> = ({ tree, id, setId, setView }) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
   // dynamically calculate width and height based on tree size
@@ -63,18 +65,21 @@ const D3Tree: React.FC<D3TreeProps> = ({ tree }) => {
       .enter()
       .append('g')
       .attr('class', 'node')
+      .attr('id', d => d.data.id)
       .attr('transform', d => `translate(${d.x},${d.y})`);
 
     // draw circles for each node
     nodes
       .append('circle')
       .attr('r', 7)
-      .attr("class", "node-circle")
+      .attr("class", d => d.data.role === 'user' ? "node-circle-user" : "node-circle")
       .on('mouseover', (event, d) => {
         onNodeHover(event, d);
       })
       .on('click', (event, d) => {
-        console.log('Click on node', d.data.id);
+        if(d.data.role === 'assistant' || d.data.role === 'developer'){
+          onNodeClick(event, d);
+        }
       })
   }
 
@@ -82,8 +87,17 @@ const D3Tree: React.FC<D3TreeProps> = ({ tree }) => {
    * On hover event listner for nodes
    */
   function onNodeHover(event: React.MouseEvent<SVGCircleElement, MouseEvent>, d: d3.HierarchyNode<TreeNode>) {
-    console.log('Hover on node', d.data.id);
+    console.log('Hover on node', d.data.id, event);
     setPreviewContent(d.data.role + ": " + d.data.content);
+  }
+
+  /**
+   * On click event listner for nodes
+   */
+  function onNodeClick(event: React.MouseEvent<SVGCircleElement, MouseEvent>, d: d3.HierarchyNode<TreeNode>) {
+    console.log('Click on node', d.data.id);
+    setId(d.data.id);
+    setView('chat');
   }
 
   useEffect(() => {
@@ -105,6 +119,12 @@ const D3Tree: React.FC<D3TreeProps> = ({ tree }) => {
     drawEdges(svg, rootNode);
 
     drawNodes(svg, rootNode);
+
+    // scroll to the node with id (the passed in prop id)
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }, [tree]);
 
   return <div className="canvasContainer">

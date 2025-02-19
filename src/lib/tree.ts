@@ -237,6 +237,50 @@ export class Tree {
     }
 
     /**
+     * deleteTree
+     * Checks if the tree data exists in IndexedDB. If it does, wipes that data.
+     */
+    public async deleteTree(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open("TreeDB", 1);
+
+            request.onupgradeneeded = () => {
+                const db = request.result;
+                if (!db.objectStoreNames.contains("treeStore")) {
+                    db.createObjectStore("treeStore", { keyPath: "id" });
+                }
+            };
+
+            request.onsuccess = () => {
+                const db = request.result;
+                const transaction = db.transaction("treeStore", "readwrite");
+                const store = transaction.objectStore("treeStore");
+
+                const getRequest = store.get("treeData");
+
+                getRequest.onsuccess = () => {
+                    const result = getRequest.result;
+                    if (result) {
+                        const deleteRequest = store.delete("treeData");
+                        deleteRequest.onsuccess = () => {
+                            this.root = null;
+                            this.nodesMap.clear();
+                            resolve();
+                        };
+                        deleteRequest.onerror = (e) => reject(e);
+                    } else {
+                        resolve();
+                    }
+                };
+
+                getRequest.onerror = (e) => reject(e);
+            };
+
+            request.onerror = (e) => reject(e);
+        });
+    }
+
+    /**
      * createTree
      * Given a role (must be "developer") and content, creates the first node of the tree.
      */

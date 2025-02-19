@@ -8,19 +8,20 @@ export interface CaretProps {
 }
 
 const Caret: React.FC<CaretProps> = ({
-    width = 20,
-    height = 20,
+    width = 30,
+    height = 30,
     fill = 'var(--primary-contrast)',
     up = false,
 }) => {
     return (
+        // by default, the caret points down
         <svg
             viewBox="0 0 24 24"
             width={width}
             height={height}
             fill={fill}
             style={{
-                transform: up ? 'rotate(180deg)' : 'none',
+                transform: up ? 'scaleY(-1) translateX(-5px)' : 'translateX(-5px)'
             }}
             xmlns="http://www.w3.org/2000/svg"
         >

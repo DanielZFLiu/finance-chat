@@ -38,6 +38,14 @@
     cursor: pointer;
 }
 
+.node-circle-user {
+    /* inner */
+    fill: var(--primary-contrast);
+
+    /* animation */
+    transition: opacity 0.3s;
+}
+
 .node-circle:hover {
     opacity: 0.7;
 }
@@ -53,5 +61,5 @@
     height: 200px;
 
     /* inner */
-    overflow-y: hidden;
+    overflow-y: auto;
 }
