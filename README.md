@@ -16,3 +16,7 @@ It is advised that your have at least a Premium Plan with FMP, as some of the en
 
 **This app only functions if you have all three of the API keys defined.**
 
+# Core Logic
+The core logic of how this app answers your questions is defined within `src/lib/pipeline.ts`. If you want to understand the code, I suggest you start there. 
+
+In addition to the backend logic, the frontend logic mostly lies within `app/page.tsx`, switching between `app/components/ChatView/ChatView.tsx` and `app/components/TreeView/TreeView.tsx`.
