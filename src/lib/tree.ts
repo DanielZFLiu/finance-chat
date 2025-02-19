@@ -16,7 +16,8 @@ export interface TreeNode {
 }
 
 export class Tree {
-    private root: TreeNode | null = null;
+    public root: TreeNode | null = null;
+
     // lookup map for nodes by id for quick access.
     private nodesMap: Map<string, TreeNode> = new Map();
 
@@ -60,7 +61,7 @@ export class Tree {
             branch.push(current);
             if (current.parentId) {
                 current = this.nodesMap.get(current.parentId);
-            } 
+            }
             else {
                 break;
             }
@@ -121,7 +122,7 @@ export class Tree {
             if (parent) {
                 parent.children = parent.children.filter((child) => child.id !== nodeId);
             }
-        } 
+        }
         else {
             this.root = null;
         }
@@ -134,6 +135,16 @@ export class Tree {
             this.nodesMap.delete(n.id);
         };
         removeRecursively(node);
+    }
+
+    /**
+     * getContent
+     * Given a node's id, return that node.
+     */
+    public getNode(nodeId: string): TreeNode {
+        const node = this.nodesMap.get(nodeId);
+        if (!node) throw new Error("Node not found");
+        return node;
     }
 
     /**
@@ -244,5 +255,49 @@ export class Tree {
         this.root = newNode;
         this.nodesMap.set(newNode.id, newNode);
         return newNode;
+    }
+
+    /**
+     * getWidth
+     * Computes the width of the tree (i.e. the maximum number of nodes at any single depth level).
+     */
+    public getWidth(): number {
+        if (!this.root) return 0;
+
+        // bfs
+        const queue: { node: TreeNode, depth: number }[] = [{ node: this.root, depth: 1 }];
+        const levelCounts: Record<number, number> = {};
+        let maxWidth = 0;
+
+        while (queue.length > 0) {
+            const { node, depth } = queue.shift()!;
+            levelCounts[depth] = (levelCounts[depth] || 0) + 1;
+            maxWidth = Math.max(maxWidth, levelCounts[depth]);
+
+            for (const child of node.children) {
+                queue.push({ node: child, depth: depth + 1 });
+            }
+        }
+
+        return maxWidth;
+    }
+
+    /**
+     * getHeight
+     * Computes the height of the tree (i.e. the length of the longest branch from the root).
+     */
+    public getHeight(): number {
+        // determine height from a given node
+        const traverse = (node: TreeNode | null): number => {
+            if (!node) return 0;
+            if (node.children.length === 0) return 1;
+            let maxChildHeight = 0;
+            for (const child of node.children) {
+                maxChildHeight = Math.max(maxChildHeight, traverse(child));
+            }
+            return 1 + maxChildHeight;
+        };
+
+        return traverse(this.root);
     }
 }

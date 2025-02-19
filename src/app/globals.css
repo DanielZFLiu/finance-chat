@@ -13,4 +13,7 @@ body {
   color: var(--primary-contrast);
   background: var(--primary-bg);
   font-family: var(--ibm-mono-plex);
+
+  /* remove margin */
+  margin: 0;
 }

@@ -1,0 +1,57 @@
+.canvasContainer{
+    /* inner */
+    overflow: auto;
+
+    /* shape */
+    width: 100vw;
+    height: 100vh;
+
+    /* position */
+    position: relative;
+}
+
+.canvas{
+    /* inner */
+    margin: auto;
+
+    /* position */
+    display: block;
+}
+
+.link {
+    /* inner */
+    fill: none;
+    stroke: var(--primary-contrast);
+
+    /* shape */
+    stroke-width: 1.5;
+}
+
+.node-circle {
+    /* inner */
+    fill: var(--primary-contrast);
+
+    /* animation */
+    transition: opacity 0.3s;
+
+    /* user interaction */
+    cursor: pointer;
+}
+
+.node-circle:hover {
+    opacity: 0.7;
+}
+
+.nodePreview{
+    /* position */
+    position: fixed;
+    top: 20px;
+    left: 30px;
+
+    /* shape */
+    width: 300px;
+    height: 200px;
+
+    /* inner */
+    overflow-y: hidden;
+}
