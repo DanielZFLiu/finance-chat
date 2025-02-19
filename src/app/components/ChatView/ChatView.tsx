@@ -3,6 +3,7 @@ import { Tree, TreeNode } from '@/lib/tree';
 import './ChatView.css';
 import { prompt } from '@/lib/pipeline';
 import Message from './Message';
+import Loader from './Loader/Loader';
 
 interface ChatViewProps {
     tree: Tree;
@@ -46,6 +47,8 @@ const ChatView: React.FC<ChatViewProps> = ({ tree, id, setId }) => {
 
     return (
         <div className="chat-container">
+            {progress !== "" && <Loader loadingText={progress} />}
+
             <div className="chat-messages">
                 {messages.map((message) => (
                     message.role !== "developer" && (

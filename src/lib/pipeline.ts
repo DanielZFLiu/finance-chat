@@ -202,6 +202,7 @@ export async function getResponse(query: string, relevantData: string, checkMore
 // the entire pipeline
 export async function prompt(query: string, setProgress: Dispatch<SetStateAction<string>>, openaiModel?: string, perplexityModel?: string, pastMessages?: { role: string; content: string; }[]): Promise<string> {
     // 1. get relevant fmp endpoints
+    setProgress("Step 1: Getting relevant endpoints...");
     const endpoints = await getRelevantEndpoints(query, openaiModel, pastMessages);
     let relevantFunctions = endpoints.relevantFunctions;
     console.log("step 1: list of relevant functions", relevantFunctions);
@@ -210,34 +211,43 @@ export async function prompt(query: string, setProgress: Dispatch<SetStateAction
     while (true) {
         // 2. potentially search the internet
         if (relevantFunctions.length === 0) {
+            setProgress("Step 2a: Determining internet use...");
             const internetUse = await determineInternetUse(query, openaiModel, pastMessages);
             console.log("step 2-a: determine internet use:", internetUse);
 
             if (internetUse) {
+                setProgress("Step 2b: Searching the internet...");
                 const perplexityResponse = await askPerplexity(query, perplexityModel, pastMessages);
                 relevantData += "Information from the internet: \n";
                 relevantData += perplexityResponse;
                 console.log("step 2-b: search the internet:", perplexityResponse);
             }
 
-            return await getResponse(query, relevantData, false, openaiModel, pastMessages);
+            setProgress("Getting final response...");
+            const finalResponse = await getResponse(query, relevantData, false, openaiModel, pastMessages);
+            setProgress("");
+            return finalResponse;
         }
 
         // 3. prepare calling fmp
+        setProgress("Step 3: Preparing api calls...");
         const functionCalls = await prepareCallingFMP(query, relevantFunctions, openaiModel, pastMessages);
         console.log("step 3: functions prepared:", functionCalls);
 
         // 4. call the relevant endpoints
+        setProgress("Step 4: Calling fmp apis...");
         const fmpData = JSON.stringify(await callFmpEndpoints(functionCalls));
         relevantData = "New Data:\n" + fmpData + "\nRelevant data from before: \n" + relevantData;
         relevantFunctions = relevantFunctions.filter((func: string) => func !== functionCalls[0].function.name);
         console.log("step 4: data retrieved from fmp:", relevantData);
 
         // 5. get response
+        setProgress("Step 5: Getting response... (May continue to step 2 if data not sufficient)");
         const response = await getResponse(query, relevantData, true, openaiModel, pastMessages);
         console.log("step 5: get response:", response);
 
         if (!response.moreInfo) {
+            setProgress("");
             return response.response;
         }
         // 6. if data not sufficient for response, iterate through other relevant endpoints
