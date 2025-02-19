@@ -83,6 +83,8 @@ export async function determineInternetUse(query: string, model?: string, pastMe
 
 // 2. search the internet
 export async function askPerplexity(query: string, model?: string, pastMessages?: { role: string; content: string; }[]) {
+    const filteredMessages = pastMessages ? pastMessages.filter((message) => message.role !== "developer") : undefined;
+
     const response = await fetch("/api/perplexity", {
         method: "POST",
         headers: {
@@ -95,7 +97,7 @@ export async function askPerplexity(query: string, model?: string, pastMessages?
                     role: "user",
                     content: `User Query: ${query} \nTask: Research about the user query. Try to list out as much details as possible relevant to the query.`
                 },
-                pastMessages
+                filteredMessages
             )
         }),
     });
@@ -198,7 +200,7 @@ export async function getResponse(query: string, relevantData: string, checkMore
 }
 
 // the entire pipeline
-export async function prompt(query: string, setProgress: Dispatch<SetStateAction<string>>, openaiModel?: string, perplexityModel?: string, pastMessages?: { role: string; content: string; }[]) {
+export async function prompt(query: string, setProgress: Dispatch<SetStateAction<string>>, openaiModel?: string, perplexityModel?: string, pastMessages?: { role: string; content: string; }[]): Promise<string> {
     // 1. get relevant fmp endpoints
     const endpoints = await getRelevantEndpoints(query, openaiModel, pastMessages);
     let relevantFunctions = endpoints.relevantFunctions;
