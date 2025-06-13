@@ -1,3 +1,5 @@
+**The fmp api key has expired, so expect bugs in the open demo. The app should still work locally, given the correct api keys.**
+
 Finance chat is your financial assistant empowered by OpenAI, FMP, and Perplexity. Query about financial statistics or news at this [link](https://fmp-finchat.vercel.app/); have fun!
 
 # Functionalities
